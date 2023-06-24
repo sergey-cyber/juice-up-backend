@@ -34,7 +34,7 @@ public class Scope {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "scope", cascade = CascadeType.REMOVE, orphanRemoval = true )
+    @OneToMany(mappedBy = "scope", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Todo> todos;
 
     @ManyToOne(fetch = FetchType.LAZY)
