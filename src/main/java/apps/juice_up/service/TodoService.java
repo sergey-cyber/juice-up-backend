@@ -71,6 +71,14 @@ public class TodoService {
                 .toList();
     }
 
+    public List<TodoDTO> getByMonth(String day) {
+        // day format = yyyy:mm
+        var todos = todoRepository.findByDayStartingWith(day);
+        return todos.stream()
+                .map((todo) -> mapToDTO(todo, new TodoDTO()))
+                .toList();
+    }
+
     private TodoDTO mapToDTO(final Todo todo, final TodoDTO todoDTO) {
         todoDTO.setId(todo.getId());
         todoDTO.setName(todo.getName());

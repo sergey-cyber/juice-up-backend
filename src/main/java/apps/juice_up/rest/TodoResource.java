@@ -65,4 +65,16 @@ public class TodoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping(value = "/in-month/{year_month}")
+    public ResponseEntity<List<TodoDTO>> getTodosByMonth(@PathVariable(name = "year_month") String year_month) {
+
+        // year_month = yyyy:mm
+        final List<TodoDTO> todosDto = todoService.getByMonth(year_month);
+
+        return todosDto != null
+                ? new ResponseEntity<>(todosDto, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
 }

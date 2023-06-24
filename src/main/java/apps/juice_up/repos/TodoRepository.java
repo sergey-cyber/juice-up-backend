@@ -11,4 +11,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByDayEquals(String day);
 
     List<Todo> findByScopeId(Long scope);
+
+    List<Todo> findByDayStartingWith(String prefix);
 }
