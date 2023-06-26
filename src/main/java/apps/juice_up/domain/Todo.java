@@ -50,6 +50,9 @@ public class Todo {
     @Column
     private String description;
 
+    @Column
+    private Boolean isImportant;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scope_id")
     private Scope scope;

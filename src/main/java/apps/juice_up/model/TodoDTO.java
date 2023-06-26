@@ -25,6 +25,8 @@ public class TodoDTO {
     @Size(max = 255)
     private String description;
 
+    private Boolean isImportant;
+
     private Long scope;
 
     private Long user;

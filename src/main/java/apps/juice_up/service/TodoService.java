@@ -85,6 +85,7 @@ public class TodoService {
         todoDTO.setStatus(todo.getStatus());
         todoDTO.setDay(todo.getDay());
         todoDTO.setDescription(todo.getDescription());
+        todoDTO.setIsImportant(todo.getIsImportant());
         todoDTO.setScope(todo.getScope() == null ? null : todo.getScope().getId());
         todoDTO.setUser(todo.getUser() == null ? null : todo.getUser().getId());
         return todoDTO;
@@ -95,6 +96,7 @@ public class TodoService {
         todo.setStatus(todoDTO.getStatus());
         todo.setDay(todoDTO.getDay());
         todo.setDescription(todoDTO.getDescription());
+        todo.setIsImportant(todoDTO.getIsImportant());
         final Scope scope = todoDTO.getScope() == null ? null : scopeRepository.findById(todoDTO.getScope())
                 .orElseThrow(() -> new NotFoundException("scope not found"));
         todo.setScope(scope);
