@@ -5,7 +5,9 @@ import apps.juice_up.model.UserDTO;
 import apps.juice_up.repos.UserRepository;
 import apps.juice_up.util.NotFoundException;
 import java.util.List;
+
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -14,8 +16,11 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(final UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(final UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserDTO> findAll() {
@@ -35,6 +40,10 @@ public class UserService {
         final User user = new User();
         mapToEntity(userDTO, user);
         return userRepository.save(user).getId();
+    }
+
+    public boolean isAlreadyExists(String userName) {
+        return userRepository.findByName(userName) != null;
     }
 
     public void update(final Long id, final UserDTO userDTO) {
@@ -62,7 +71,9 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setRole(userDTO.getRole());
         user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
+
+        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+        user.setPassword(encodedPassword);
         user.setPhone(userDTO.getPhone());
         return user;
     }

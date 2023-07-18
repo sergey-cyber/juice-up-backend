@@ -1,0 +1,61 @@
+package apps.juice_up.rest;
+
+import apps.juice_up.model.AuthRequest;
+import apps.juice_up.model.AuthResponse;
+import apps.juice_up.model.UserDTO;
+import apps.juice_up.service.JwtTokenService;
+import apps.juice_up.service.JwtUserDetailsService;
+import apps.juice_up.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+@RestController
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+public class AuthResource {
+    private final JwtUserDetailsService jwtUserDetailsService;
+    private final JwtTokenService jwtTokenService;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+
+
+    public AuthResource(final JwtUserDetailsService jwtUserDetailsService, final JwtTokenService jwtTokenService, AuthenticationManager authenticationManager, UserService userService) {
+        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.jwtTokenService = jwtTokenService;
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+    }
+
+    @PostMapping("/auth")
+    public ResponseEntity<AuthResponse>  authenticate(@RequestBody @Valid final AuthRequest authenticationRequest) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getLogin(), authenticationRequest.getPassword()));
+        } catch (final BadCredentialsException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getLogin());
+        final AuthResponse authenticationResponse = new AuthResponse();
+        authenticationResponse.setAccessToken(jwtTokenService.generateToken(userDetails));
+        return ResponseEntity.ok(authenticationResponse);
+    }
+
+    @PostMapping("/registration")
+    public ResponseEntity<Long> registration(@RequestBody final UserDTO userDTO) {
+        if(userService.isAlreadyExists(userDTO.getName())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, String.format("User with name %s already exists.", userDTO.getName())
+            );
+        }
+        var new_user_id = userService.create(userDTO);
+        return new ResponseEntity<>(new_user_id, HttpStatus.CREATED);
+    }
+}
