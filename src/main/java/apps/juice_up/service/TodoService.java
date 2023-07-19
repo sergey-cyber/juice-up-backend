@@ -34,6 +34,13 @@ public class TodoService {
                 .toList();
     }
 
+    public List<TodoDTO> findByUserId(Long id) {
+        final List<Todo> todos = todoRepository.findByUserId(id);
+        return todos.stream()
+                .map((todo) -> mapToDTO(todo, new TodoDTO()))
+                .toList();
+    }
+
     public TodoDTO get(final Long id) {
         return todoRepository.findById(id)
                 .map((todo) -> mapToDTO(todo, new TodoDTO()))
@@ -57,23 +64,23 @@ public class TodoService {
         todoRepository.deleteById(id);
     }
 
-    public List<TodoDTO> getByDay(String day) {
-        final List<Todo> todos = todoRepository.findByDayEquals(day);
+    public List<TodoDTO> getByDay(Long id, String day) {
+        final List<Todo> todos = todoRepository.findByUserIdAndDayEquals(id, day);
         return todos.stream()
                 .map((todo) -> mapToDTO(todo, new TodoDTO()))
                 .toList();
     }
 
-    public List<TodoDTO> searchByScopeId(Long id) {
-        final List<Todo> todos = todoRepository.findByScopeId(id);
+    public List<TodoDTO> searchByScopeId(Long userId, Long id) {
+        final List<Todo> todos = todoRepository.findByUserIdAndScopeId(userId, id);
         return todos.stream()
                 .map((todo) -> mapToDTO(todo, new TodoDTO()))
                 .toList();
     }
 
-    public List<TodoDTO> getByMonth(String day) {
+    public List<TodoDTO> getByMonth(Long id, String day) {
         // day format = yyyy:mm
-        var todos = todoRepository.findByDayStartingWith(day);
+        var todos = todoRepository.findByUserIdAndDayStartingWith(id, day);
         return todos.stream()
                 .map((todo) -> mapToDTO(todo, new TodoDTO()))
                 .toList();
