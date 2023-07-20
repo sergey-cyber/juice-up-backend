@@ -2,6 +2,7 @@ package apps.juice_up.rest;
 
 import apps.juice_up.model.AuthRequest;
 import apps.juice_up.model.AuthResponse;
+import apps.juice_up.model.JwtUserDetails;
 import apps.juice_up.model.UserDTO;
 import apps.juice_up.service.JwtTokenService;
 import apps.juice_up.service.JwtUserDetailsService;
@@ -13,9 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,5 +61,15 @@ public class AuthResource {
         }
         var new_user_id = userService.create(userDTO);
         return new ResponseEntity<>(new_user_id, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/who-am-i")
+    public ResponseEntity<?> whoAmI(@AuthenticationPrincipal JwtUserDetails principal) {
+        //TODO: need normal DTO
+        var user = Map.of(
+                "name", principal.getUsername(),
+                "id", principal.getId()
+        );
+        return ResponseEntity.ok(user);
     }
 }
