@@ -8,7 +8,6 @@ import apps.juice_up.repos.UserRepository;
 import apps.juice_up.util.NotFoundException;
 import java.util.List;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,13 @@ public class ScopeService {
 
     public List<ScopeDTO> findAll() {
         final List<Scope> scopes = scopeRepository.findAll(Sort.by("id"));
+        return scopes.stream()
+                .map((scope) -> mapToDTO(scope, new ScopeDTO()))
+                .toList();
+    }
+
+    public List<ScopeDTO> findByUserId(Long id) {
+        final List<Scope> scopes = scopeRepository.findByUserId(id);
         return scopes.stream()
                 .map((scope) -> mapToDTO(scope, new ScopeDTO()))
                 .toList();
