@@ -42,7 +42,7 @@ public class TodoResource {
         if(!Objects.equals(todo.getUser(), principal.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok(todoService.get(id));
+        return ResponseEntity.ok(todo);
     }
 
     // TODO: лучше сделать метод search и в requestBody отправлять query-filter

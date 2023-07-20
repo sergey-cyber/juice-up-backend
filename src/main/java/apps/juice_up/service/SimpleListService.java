@@ -30,6 +30,13 @@ public class SimpleListService {
                 .toList();
     }
 
+    public List<SimpleListDTO> findByUserId(Long id) {
+        final List<SimpleList> simpleLists = simpleListRepository.findByUserId(id);
+        return simpleLists.stream()
+                .map((simpleList) -> mapToDTO(simpleList, new SimpleListDTO()))
+                .toList();
+    }
+
     public SimpleListDTO get(final Long id) {
         return simpleListRepository.findById(id)
                 .map((simpleList) -> mapToDTO(simpleList, new SimpleListDTO()))
