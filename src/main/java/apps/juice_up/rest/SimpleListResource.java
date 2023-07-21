@@ -44,7 +44,8 @@ public class SimpleListResource {
     @PostMapping
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createSimpleList(
-            @RequestBody @Valid final SimpleListDTO simpleListDTO) {
+            @RequestBody @Valid final SimpleListDTO simpleListDTO, @AuthenticationPrincipal JwtUserDetails principal) {
+        simpleListDTO.setUser(principal.getId());
         final Long createdId = simpleListService.create(simpleListDTO);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }

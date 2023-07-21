@@ -66,7 +66,9 @@ public class TodoResource {
 
     @PostMapping
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createTodo(@RequestBody @Valid final TodoDTO todoDTO) {
+    public ResponseEntity<Long> createTodo(
+            @RequestBody @Valid final TodoDTO todoDTO, @AuthenticationPrincipal JwtUserDetails principal) {
+        todoDTO.setUser(principal.getId());
         final Long createdId = todoService.create(todoDTO);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }

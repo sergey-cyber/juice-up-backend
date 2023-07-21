@@ -43,7 +43,9 @@ public class ScopeResource {
 
     @PostMapping
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createScope(@RequestBody @Valid final ScopeDTO scopeDTO) {
+    public ResponseEntity<Long> createScope(
+            @RequestBody @Valid final ScopeDTO scopeDTO, @AuthenticationPrincipal JwtUserDetails principal) {
+        scopeDTO.setUser(principal.getId());
         final Long createdId = scopeService.create(scopeDTO);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
