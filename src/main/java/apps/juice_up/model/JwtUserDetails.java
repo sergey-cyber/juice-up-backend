@@ -13,9 +13,9 @@ public class JwtUserDetails extends User {
 
     public final Long id;
 
-    public final String telegramId;
+    public final Long telegramId;
 
-    public JwtUserDetails(final Long id, final String telegramId, final String username, final String hash,
+    public JwtUserDetails(final Long id, final Long telegramId, final String username, final String hash,
                           final Collection<? extends GrantedAuthority> authorities) {
         super(username, hash, authorities);
         this.id = id;

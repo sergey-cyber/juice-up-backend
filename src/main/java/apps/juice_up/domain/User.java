@@ -55,7 +55,7 @@ public class User {
     private String phone;
 
     @Column
-    private String telegramId;
+    private Long telegramId;
 
     @OneToMany(mappedBy = "user")
     private Set<SimpleList> simpleLists;
