@@ -31,4 +31,6 @@ public class TodoDTO {
 
     private Long user;
 
+    private Long tlgNotification;
+
 }

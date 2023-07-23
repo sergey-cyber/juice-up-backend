@@ -30,7 +30,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         }
         final List<SimpleGrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority(ROLE_USER));
         // TODO: need user.getHash() вместо getPassword(): see https://bootify.io/spring-security/rest-api-spring-security-with-jwt.html
-        return new JwtUserDetails(client.getId(), username, client.getPassword(), roles);
+        return new JwtUserDetails(client.getId(), client.getTelegramId(), username, client.getPassword(), roles);
     }
 
 }

@@ -1,15 +1,7 @@
 package apps.juice_up.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
+
 import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,6 +44,9 @@ public class Todo {
 
     @Column
     private Boolean isImportant;
+
+    @OneToOne(mappedBy = "todo", fetch = FetchType.LAZY)
+    private TlgNotification tlgNotification;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scope_id")
