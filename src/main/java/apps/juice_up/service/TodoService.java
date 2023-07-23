@@ -95,7 +95,6 @@ public class TodoService {
         todoDTO.setIsImportant(todo.getIsImportant());
         todoDTO.setScope(todo.getScope() == null ? null : todo.getScope().getId());
         todoDTO.setUser(todo.getUser() == null ? null : todo.getUser().getId());
-        todoDTO.setTlgNotification(todo.getTlgNotification() == null ? null : todo.getTlgNotification().getId());
         return todoDTO;
     }
 

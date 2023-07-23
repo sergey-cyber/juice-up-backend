@@ -2,8 +2,7 @@ package apps.juice_up.model;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.Date;
-
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +14,7 @@ public class TlgNotificationDTO {
     private Long id;
 
     @NotNull
-    private Date executeTimestamp;
+    private OffsetDateTime executeTimestamp;
 
     @Size(max = 255)
     private String message;

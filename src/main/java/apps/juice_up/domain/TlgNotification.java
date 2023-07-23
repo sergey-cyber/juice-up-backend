@@ -11,8 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import java.time.OffsetDateTime;
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,7 +39,7 @@ public class TlgNotification {
     private Long id;
 
     @Column(nullable = false)
-    private Date executeTimestamp;
+    private OffsetDateTime executeTimestamp;
 
     @Column
     private String message;

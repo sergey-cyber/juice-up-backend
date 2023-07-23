@@ -1,12 +1,16 @@
 package apps.juice_up.bot;
 
-import apps.juice_up.bot.components.BotSkills;
+import apps.juice_up.bot.components.BotCommands;
+import apps.juice_up.bot.components.Buttons;
+import apps.juice_up.repos.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,7 +21,8 @@ import static apps.juice_up.bot.components.BotCommands.LIST_OF_COMMANDS;
 @Component
 public class TelegramNotificationBot extends TelegramLongPollingBot {
 
-    private final BotSkills botSkills = new BotSkills();
+    @Autowired
+    private UserRepository userRepository;
 
     public TelegramNotificationBot(@Value("${bot.token}") String botToken) {
         super(botToken);
@@ -62,16 +67,66 @@ public class TelegramNotificationBot extends TelegramLongPollingBot {
     private void botAnswerUtils(String receivedMessage, long chatId, String userName) {
         System.out.println(receivedMessage);
         if(receivedMessage.startsWith("@")) {
-            botSkills.activate(chatId, receivedMessage);
+            activate(chatId, receivedMessage);
             return;
         }
         switch (receivedMessage) {
-            case "/start" -> botSkills.startBot(chatId, userName);
-            case "/help" -> botSkills.sendHelpText(chatId);
+            case "/start" -> startBot(chatId, userName);
+            case "/help" -> sendHelpText(chatId);
             //TODO: add enable/disable actions. See: https://stackoverflow.com/questions/67774182/how-to-allow-java-telegram-bot-wait-user-reply
-            case "/enable" -> botSkills.enableNotificationInfo(chatId);
+            case "/enable" -> enableNotificationInfo(chatId);
             default -> {
             }
+        }
+    }
+
+    private void startBot(long chatId, String userName) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText("Hi, " + userName + "! I'm a Telegram bot.'");
+        message.setReplyMarkup(Buttons.inlineMarkup());
+
+        sendMessage(message);
+    }
+
+    private void sendHelpText(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(BotCommands.HELP_TEXT);
+
+        sendMessage(message);
+    }
+
+    private void enableNotificationInfo(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText("Input your user_name from 'juice up' application. " +
+                "The name must begin with the @ symbol");
+
+        sendMessage(message);
+    }
+
+    private void activate(long chatId, String forUser) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        var user = userRepository.findByName(forUser.substring(1));
+        if(user == null) {
+            message.setText("Error: user with name " + forUser +  " not found");
+            sendMessage(message);
+            return;
+        }
+        user.setTelegramId(chatId);
+        userRepository.save(user);
+        message.setText("Notification enabled for user with name " + forUser);
+        sendMessage(message);
+    }
+
+    private void sendMessage(SendMessage message) {
+        try {
+            execute(message);
+            log.info("Reply sent");
+        } catch (TelegramApiException e){
+            log.error(e.getMessage());
         }
     }
 }

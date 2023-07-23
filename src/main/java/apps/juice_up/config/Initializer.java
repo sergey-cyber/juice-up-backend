@@ -13,7 +13,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Slf4j
 @Component
-public class BotInitializer {
+public class Initializer {
     @Autowired
     TelegramNotificationBot bot;
 
