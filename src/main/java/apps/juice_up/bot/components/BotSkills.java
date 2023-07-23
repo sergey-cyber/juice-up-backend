@@ -6,6 +6,7 @@ import apps.juice_up.model.TlgNotificationDTO;
 import apps.juice_up.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -13,12 +14,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Slf4j
+@Component
 public class BotSkills {
 
     @Autowired
     private UserRepository userRepository;
-
-    public BotSkills() {}
 
     public void startBot(long chatId, String userName) {
         SendMessage message = new SendMessage();

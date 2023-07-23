@@ -3,6 +3,7 @@ package apps.juice_up.bot;
 import apps.juice_up.bot.components.BotSkills;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,8 @@ import static apps.juice_up.bot.components.BotCommands.LIST_OF_COMMANDS;
 @PropertySource("bot.properties")
 public class TelegramNotificationBot extends TelegramLongPollingBot {
 
-    private final BotSkills botSkills = new BotSkills();
+    @Autowired
+    private BotSkills botSkills;
 
     public TelegramNotificationBot(@Value("${bot.token}") String botToken) {
         super(botToken);

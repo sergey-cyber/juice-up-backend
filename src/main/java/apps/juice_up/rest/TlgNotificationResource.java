@@ -28,10 +28,12 @@ public class TlgNotificationResource {
 
     private final TlgNotificationService tlgNotificationService;
     private final TodoService todoService;
+    private final BotSkills botSkills;
 
-    public TlgNotificationResource(final TlgNotificationService tlgNotificationService, TodoService todoService) {
+    public TlgNotificationResource(final TlgNotificationService tlgNotificationService, TodoService todoService, BotSkills botSkills) {
         this.tlgNotificationService = tlgNotificationService;
         this.todoService = todoService;
+        this.botSkills = botSkills;
     }
 
     @GetMapping
@@ -75,7 +77,6 @@ public class TlgNotificationResource {
         final Long createdId = tlgNotificationService.create(tlgNotificationDTO);
         todoDto.setTlgNotification(createdId);
         todoService.update(todoDto.getId(), todoDto);
-        var botSkills = new BotSkills();
         botSkills.sendMessageToSpecificTime(tlgNotificationDTO, principal.getTelegramId());
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
