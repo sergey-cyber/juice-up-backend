@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 @CrossOrigin(methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.POST})
 @RestController
 @RequestMapping(value = "/api/tlgNotifications", produces = MediaType.APPLICATION_JSON_VALUE)
+@PropertySource("bot.properties")
 public class TlgNotificationResource {
 
     private final TlgNotificationService tlgNotificationService;
