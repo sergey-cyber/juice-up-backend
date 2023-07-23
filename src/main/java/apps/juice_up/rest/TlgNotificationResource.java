@@ -1,12 +1,18 @@
 package apps.juice_up.rest;
 
+import apps.juice_up.bot.components.BotSkills;
 import apps.juice_up.model.JwtUserDetails;
 import apps.juice_up.model.TlgNotificationDTO;
 import apps.juice_up.service.TlgNotificationService;
 import apps.juice_up.service.TodoService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+
+import java.util.Date;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 @CrossOrigin(methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.POST})
 @RestController
 @RequestMapping(value = "/api/tlgNotifications", produces = MediaType.APPLICATION_JSON_VALUE)
+@PropertySource("bot.properties")
 public class TlgNotificationResource {
 
     private final TlgNotificationService tlgNotificationService;
@@ -42,18 +49,34 @@ public class TlgNotificationResource {
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createTlgNotification(
             @RequestBody @Valid final TlgNotificationDTO tlgNotificationDTO,
-            @AuthenticationPrincipal JwtUserDetails principal
+            @AuthenticationPrincipal JwtUserDetails principal,
+            @Value("${bot.name}") String botName
     ) {
         if(principal.getTelegramId() == null) {
             throw new ResponseStatusException(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "You are not subscribed to the notification mailing list. To fix this send a message to the bot"
+                "You are not subscribed to the notification mailing list. To fix this send a message to the " + botName
             );
         }
-        final Long createdId = tlgNotificationService.create(tlgNotificationDTO);
+
+        var currentDate = new Date();
+        System.out.println("Current: " + currentDate);
+        if (tlgNotificationDTO.getExecuteTimestamp().before(currentDate)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Specified time is after current time"
+            );
+        }
+
         var todoDto = todoService.get(tlgNotificationDTO.getTodo());
+        tlgNotificationDTO.setRecipientId(principal.getTelegramId());
+        var extraMessage = tlgNotificationDTO.getMessage() != null ? tlgNotificationDTO.getMessage() : "";
+        tlgNotificationDTO.setMessage(todoDto.getName() + "; " + extraMessage);
+        final Long createdId = tlgNotificationService.create(tlgNotificationDTO);
         todoDto.setTlgNotification(createdId);
         todoService.update(todoDto.getId(), todoDto);
+        var botSkills = new BotSkills();
+        botSkills.sendMessageToSpecificTime(tlgNotificationDTO, principal.getTelegramId());
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 
