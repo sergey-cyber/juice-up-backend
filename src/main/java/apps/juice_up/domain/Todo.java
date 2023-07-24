@@ -45,7 +45,7 @@ public class Todo {
     @Column
     private Boolean isImportant;
 
-    @OneToOne(mappedBy = "todo", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "todo", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private TlgNotification tlgNotification;
 
     @ManyToOne(fetch = FetchType.LAZY)
