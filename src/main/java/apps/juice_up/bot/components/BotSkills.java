@@ -4,6 +4,7 @@ import apps.juice_up.bot.ApplicationContextProvider;
 import apps.juice_up.bot.TelegramNotificationBot;
 import apps.juice_up.model.TlgNotificationDTO;
 import apps.juice_up.repos.UserRepository;
+import apps.juice_up.service.TlgNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,8 @@ public class BotSkills {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TlgNotificationService tlgNotificationService;
 
     public void startBot(long chatId, String userName) {
         SendMessage message = new SendMessage();
@@ -71,13 +74,27 @@ public class BotSkills {
         }
     }
 
+    public void sendMessage(String text, long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+        try {
+            TelegramNotificationBot telegramBot = ApplicationContextProvider.getApplicationContext().getBean(TelegramNotificationBot.class);
+            telegramBot.execute(message);
+            log.info("Reply sent");
+        } catch (TelegramApiException e){
+            log.error(e.getMessage());
+        }
+    }
+
     private static class SendMessageTask extends TimerTask {
         private final TlgNotificationDTO tlgNotificationDTO;
         private final long chatId;
-
-        public SendMessageTask(TlgNotificationDTO tlgNotificationDTO, long chatId) {
+        private final TlgNotificationService tlgNotificationService;
+        public SendMessageTask(TlgNotificationDTO tlgNotificationDTO, long chatId, TlgNotificationService tlgNotificationService) {
             this.tlgNotificationDTO = tlgNotificationDTO;
             this.chatId = chatId;
+            this.tlgNotificationService = tlgNotificationService;
         }
 
         @Override
@@ -88,7 +105,7 @@ public class BotSkills {
                 message.setText(tlgNotificationDTO.getMessage());
                 TelegramNotificationBot telegramBot = ApplicationContextProvider.getApplicationContext().getBean(TelegramNotificationBot.class);
                 telegramBot.execute(message);
-                log.info("Reply sent");
+                tlgNotificationService.delete(tlgNotificationDTO.getId());
             } catch (TelegramApiException e){
                 log.error(e.getMessage());
             }
@@ -100,7 +117,7 @@ public class BotSkills {
         Timer timer = new Timer();
 
         //Use this if you want to execute it once
-        timer.schedule(new SendMessageTask(tlgNotificationDTO, chatId), tlgNotificationDTO.getExecuteTimestamp());
+        timer.schedule(new SendMessageTask(tlgNotificationDTO, chatId, tlgNotificationService), tlgNotificationDTO.getExecuteTimestamp());
         System.out.println("Timer installed in " + tlgNotificationDTO.getExecuteTimestamp());
         //Use this if you want to execute it repeatedly
         //int period = 10000;
