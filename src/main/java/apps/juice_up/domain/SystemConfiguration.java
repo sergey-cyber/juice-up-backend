@@ -40,8 +40,8 @@ public class SystemConfiguration {
     )
     private Long id;
 
-    @Column(nullable = false)
-    private OverdueTodosPolicyActions overdueTodosPolicy = OverdueTodosPolicyActions.IGNORE;
+    @Column
+    private OverdueTodosPolicyActions overdueTodosPolicy;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
