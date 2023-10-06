@@ -1,11 +1,9 @@
 package apps.juice_up.rest;
 
-import apps.juice_up.model.AuthRequest;
-import apps.juice_up.model.AuthResponse;
-import apps.juice_up.model.JwtUserDetails;
-import apps.juice_up.model.UserDTO;
+import apps.juice_up.model.*;
 import apps.juice_up.service.JwtTokenService;
 import apps.juice_up.service.JwtUserDetailsService;
+import apps.juice_up.service.SystemConfigurationService;
 import apps.juice_up.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,13 +26,15 @@ public class AuthResource {
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final SystemConfigurationService systemConfigurationService;
 
 
-    public AuthResource(final JwtUserDetailsService jwtUserDetailsService, final JwtTokenService jwtTokenService, AuthenticationManager authenticationManager, UserService userService) {
+    public AuthResource(final JwtUserDetailsService jwtUserDetailsService, final JwtTokenService jwtTokenService, AuthenticationManager authenticationManager, UserService userService, SystemConfigurationService systemConfigurationService) {
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtTokenService = jwtTokenService;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.systemConfigurationService = systemConfigurationService;
     }
 
     @PostMapping("/auth")
@@ -60,6 +60,9 @@ public class AuthResource {
             );
         }
         var new_user_id = userService.create(userDTO);
+        var systemConfiguration = new SystemConfigurationDTO();
+        systemConfiguration.setUser(new_user_id);
+        systemConfigurationService.create(systemConfiguration);
         return new ResponseEntity<>(new_user_id, HttpStatus.CREATED);
     }
 
